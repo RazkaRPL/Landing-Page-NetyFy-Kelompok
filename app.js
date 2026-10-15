@@ -7,6 +7,7 @@ const contactBox = document.getElementById('contactbox');
 const orderBox = document.getElementById('orderbox');
 const menuToggle = document.getElementById('menu-toggle');
 const menuList = document.getElementById('menu-list');
+const menuOverlay = document.getElementById('sidebar-overlay');
 
 /* ================= Tema terang / gelap ================= */
 function getTheme() {
@@ -68,15 +69,20 @@ document.querySelectorAll('.contactbox').forEach(function (box) {
     });
 });
 
-/* ================= Menu hamburger (klik logo Home) ================= */
+/* ================= Sidebar hamburger (klik logo Home) ================= */
 function openMenu() {
     menuList.classList.add('open');
+    menuOverlay.classList.add('open');
+    document.body.classList.add('menu-open');
     menuToggle.setAttribute('aria-expanded', 'true');
     menuToggle.setAttribute('aria-label', 'Tutup menu');
+    menuList.querySelector('.sidebar-close').focus();
 }
 
 function closeMenu(returnFocus) {
     menuList.classList.remove('open');
+    menuOverlay.classList.remove('open');
+    document.body.classList.remove('menu-open');
     menuToggle.setAttribute('aria-expanded', 'false');
     menuToggle.setAttribute('aria-label', 'Buka menu');
     if (returnFocus) menuToggle.focus();
@@ -90,16 +96,13 @@ menuToggle.addEventListener('click', function () {
     }
 });
 
-// Klik link di dalam menu menutup menu
+// Tombol X dan klik area gelap menutup sidebar
+menuList.querySelector('.sidebar-close').addEventListener('click', function () { closeMenu(true); });
+menuOverlay.addEventListener('click', function () { closeMenu(); });
+
+// Klik link di dalam sidebar menutup sidebar
 menuList.querySelectorAll('a.menu-item').forEach(function (link) {
     link.addEventListener('click', function () { closeMenu(); });
-});
-
-// Klik di luar menu menutup menu
-document.addEventListener('click', function (e) {
-    if (!menuList.classList.contains('open')) return;
-    if (menuList.contains(e.target) || menuToggle.contains(e.target)) return;
-    closeMenu();
 });
 
 /* ================= Tombol Contact (navbar & menu) ================= */
@@ -147,21 +150,23 @@ document.getElementById('order-submit').addEventListener('click', function () {
     closeBox(orderBox);
 });
 
-/* ================= Keyboard: Escape & jebakan Tab di popup ================= */
+/* ================= Keyboard: Escape & jebakan Tab ================= */
 document.addEventListener('keydown', function (e) {
-    const open = document.querySelector('.contactbox.showed');
+    const openModal = document.querySelector('.contactbox.showed');
+    const menuOpen = menuList.classList.contains('open');
 
     if (e.key === 'Escape') {
-        if (open) {
-            closeBox(open);
-        } else if (menuList.classList.contains('open')) {
+        if (openModal) {
+            closeBox(openModal);
+        } else if (menuOpen) {
             closeMenu(true);
         }
         return;
     }
 
-    if (e.key === 'Tab' && open) {
-        const items = open.querySelectorAll('button, a[href], input:not([type="radio"]), input[type="radio"]:checked');
+    const trap = openModal || (menuOpen ? menuList : null);
+    if (e.key === 'Tab' && trap) {
+        const items = trap.querySelectorAll('button, a[href], input:not([type="radio"]), input[type="radio"]:checked');
         if (!items.length) return;
         const first = items[0];
         const last = items[items.length - 1];
