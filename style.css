@@ -1150,3 +1150,16 @@ body.modal-open {
 body.menu-open {
     overflow: hidden;
 }
+
+iframe{
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.netflix-video{
+    width: 700px;
+    height: 500px;
+    display: flex;
+    margin: 0 auto;
+}
